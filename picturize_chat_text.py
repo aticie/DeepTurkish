@@ -54,7 +54,7 @@ def draw_lines(lines):
     draw.text((8, 11 * 28), ">", (255, 255, 255), font=font)
     draw.text((8 + 15, 11 * 28), "|", (230, 230, 230), font=font)
 
-    cropped_bg.save("sample.png")
+    return cropped_bg
 
 
 def validate_lines(lines):
@@ -62,6 +62,9 @@ def validate_lines(lines):
         try:
             x = line.split(':')[:2]
         except:
+            return False
+
+        if len(line) < 1:
             return False
 
     return True
@@ -78,13 +81,29 @@ def filter_words(lines):
     return new_lines
 
 
+def select_lines_from_sample(sample):
+    lines = sample.splitlines()
+    select_this = random.randint(0, len(lines) - 11)
+    return lines[select_this:select_this + 11]
+
+
+def validate_sample(sample):
+    return len(sample.splitlines()) >= 11
+
+
 if __name__ == '__main__':
     with open('gpt2_gentext.txt', encoding='utf-8') as f:
         data = f.read()
 
-    selected_lines = select_sample(data)
-    while not validate_lines(selected_lines):
-        selected_lines = select_sample(data)
+    samples = data.split("====================")
+    os.makedirs('sample_images', exist_ok=True)
+    for i, sample in enumerate(samples):
+        if not validate_sample(sample):
+            continue
+        selected_lines = select_lines_from_sample(sample)
+        while not validate_lines(selected_lines):
+            selected_lines = select_lines_from_sample(sample)
 
-    new_lines = filter_words(selected_lines)
-    draw_lines(new_lines)
+        new_lines = filter_words(selected_lines)
+        img = draw_lines(new_lines)
+        img.save(os.path.join('sample_images', f'sample{i}.png'))
