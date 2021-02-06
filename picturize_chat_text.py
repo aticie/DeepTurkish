@@ -46,9 +46,9 @@ def draw_lines(lines):
     draw = PIL.ImageDraw.Draw(cropped_bg)
     for line_no, line in enumerate(lines):
         username_part = ':'.join(line.split(':')[:2])
-        text_part = ':'.join(line.split(':')[2:])
+        text_part = " " + ':'.join(line.split(':')[2:]).strip()
         draw.text((8, line_no * 28), username_part + ":", (255, 240, 154), font=font)
-        username_width = font.getmask(username_part).getbbox()[2]
+        username_width = font.getmask(username_part + ":").getbbox()[2]
         draw.text((8 + username_width, line_no * 28), text_part, (255, 255, 255), font=font)
 
     draw.text((8, 11 * 28), ">", (255, 255, 255), font=font)
